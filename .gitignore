@@ -1,0 +1,19 @@
+# Dependencies and builds
+node_modules/
+.next/
+dist/
+coverage/
+.turbo/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and OS files
+*.log
+.DS_Store
+
+# Local temporary outputs
+tmp/
+
