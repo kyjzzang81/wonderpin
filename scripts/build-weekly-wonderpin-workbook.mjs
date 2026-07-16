@@ -13,18 +13,18 @@ const candidates = wb.worksheets.add('프로그램 후보');
 const queue = wb.worksheets.add('발행 전 재확인');
 const dict = wb.worksheets.add('데이터 사전');
 
-const purple = '#5A3FA3';
-const pink = '#F28CA6';
-const palePurple = '#F2EFFA';
-const palePink = '#FDECF0';
-const dark = '#27242D';
-const border = '#DDD8E8';
+const primary = '#0167D3';
+const secondary = '#F3B806';
+const palePrimary = '#EAF4FF';
+const paleSecondary = '#FFF8DD';
+const dark = '#1D2A3A';
+const border = '#D7E3F2';
 
 function styleTitle(sheet, range) {
-  sheet.getRange(range).format = { fill: purple, font: { bold: true, color: '#FFFFFF', size: 16 }, horizontalAlignment: 'left', verticalAlignment: 'center' };
+  sheet.getRange(range).format = { fill: primary, font: { bold: true, color: '#FFFFFF', size: 16 }, horizontalAlignment: 'left', verticalAlignment: 'center' };
 }
 function styleHeader(sheet, range) {
-  sheet.getRange(range).format = { fill: purple, font: { bold: true, color: '#FFFFFF' }, horizontalAlignment: 'center', verticalAlignment: 'center', wrapText: true, borders: { preset: 'all', style: 'thin', color: border } };
+  sheet.getRange(range).format = { fill: primary, font: { bold: true, color: '#FFFFFF' }, horizontalAlignment: 'center', verticalAlignment: 'center', wrapText: true, borders: { preset: 'all', style: 'thin', color: border } };
 }
 
 summary.showGridLines = false;
@@ -34,11 +34,11 @@ styleTitle(summary, 'A1:H1');
 summary.getRange('A1:H1').format.rowHeight = 32;
 summary.mergeCells('A3:H4');
 summary.getRange('A3').values = [[`기준일 ${source.as_of} · 후보 ${rows.length}건(공공 기관 진입점 + 사설 운영자 프로그램)을 정리했습니다. 현재 회차 모집·연령·가격·후기 원문은 항목별 상태를 확인하고, 게시·서비스 반영 전 반드시 공식 원출처에서 재확인해야 합니다.`]];
-summary.getRange('A3:H4').format = { fill: palePink, font: { color: dark }, wrapText: true, verticalAlignment: 'center', borders: { preset: 'outside', style: 'thin', color: pink } };
+summary.getRange('A3:H4').format = { fill: paleSecondary, font: { color: dark }, wrapText: true, verticalAlignment: 'center', borders: { preset: 'outside', style: 'thin', color: secondary } };
 summary.getRange('A6:B6').values = [['후보 수', '현재 모집 확인']];
 summary.getRange('D6:E6').values = [['공공 후보', '사설 후보']];
 summary.getRange('G6:H6').values = [['발행 전 재확인', '재확인 기본 주기']];
-for (const r of ['A6:B6','D6:E6','G6:H6']) summary.getRange(r).format = { fill: palePurple, font: { bold: true, color: purple }, horizontalAlignment: 'center', borders: { preset: 'outside', style: 'thin', color: border } };
+for (const r of ['A6:B6','D6:E6','G6:H6']) summary.getRange(r).format = { fill: palePrimary, font: { bold: true, color: primary }, horizontalAlignment: 'center', borders: { preset: 'outside', style: 'thin', color: border } };
 summary.getRange('A7:B7').formulas = [[`=COUNTA('프로그램 후보'!A2:A${endRow})`, `=COUNTIF('프로그램 후보'!O2:O${endRow},"현재 모집*")`]];
 summary.getRange('D7:E7').formulas = [[`=COUNTIF('프로그램 후보'!D2:D${endRow},"공공")`, `=COUNTIF('프로그램 후보'!D2:D${endRow},"사설")`]];
 summary.getRange('G7').formulas = [[`=COUNTA('프로그램 후보'!A2:A${endRow})`]];
@@ -46,7 +46,7 @@ summary.getRange('H7').values = [['7일 이내']];
 for (const r of ['A7:B7','D7:E7','G7:H7']) summary.getRange(r).format = { fill: '#FFFFFF', font: { bold: true, color: dark, size: 14 }, horizontalAlignment: 'center', borders: { preset: 'outside', style: 'thin', color: border } };
 summary.getRange('A9:H9').merge();
 summary.getRange('A9').values = [['사용 순서']];
-summary.getRange('A9:H9').format = { fill: purple, font: { bold: true, color: '#FFFFFF' } };
+summary.getRange('A9:H9').format = { fill: primary, font: { bold: true, color: '#FFFFFF' } };
 summary.getRange('A10:H14').values = [
   ['1. 프로그램 후보 시트에서 지역·장소 유형·우선순위를 필터링합니다.', '', '', '', '', '', '', ''],
   ['2. 소개 링크와 예약 링크에서 해당 회차의 일정·연령·비용·모집 상태를 확인합니다.', '', '', '', '', '', '', ''],
@@ -57,7 +57,7 @@ summary.getRange('A10:H14').values = [
 summary.getRange('A10:H14').format = { wrapText: true, verticalAlignment: 'center' };
 summary.getRange('A16:H16').merge();
 summary.getRange('A16').values = [['품질 상태: 공공 80건은 기관 진입점 후보, 사설 12건은 운영자 프로그램 후보입니다. 모든 사설 행도 회차·잔여석·후기 상태를 발행 전에 재확인해야 합니다.']];
-summary.getRange('A16:H16').format = { fill: palePink, font: { bold: true, color: dark }, wrapText: true, borders: { preset: 'outside', style: 'thin', color: pink } };
+summary.getRange('A16:H16').format = { fill: paleSecondary, font: { bold: true, color: dark }, wrapText: true, borders: { preset: 'outside', style: 'thin', color: secondary } };
 for (const c of ['A','B','C','D','E','F','G','H']) summary.getRange(`${c}:${c}`).format.columnWidth = c === 'A' ? 26 : 18;
 summary.getRange('A3:H4').format.rowHeight = 32;
 summary.getRange('A10:H14').format.rowHeight = 42;
@@ -77,8 +77,8 @@ for (let i = 0; i < widths.length; i++) candidates.getRangeByIndexes(0,i,values.
 candidates.tables.add(`A1:AA${values.length + 1}`, true, 'ProgramCandidates');
 candidates.freezePanes.freezeRows(1);
 candidates.freezePanes.freezeColumns(3);
-candidates.getRange(`D2:D${values.length + 1}`).conditionalFormats.add('containsText', { text: '공공', format: { fill: palePurple, font: { color: purple } } });
-candidates.getRange(`O2:O${values.length + 1}`).conditionalFormats.add('containsText', { text: '미확인', format: { fill: palePink, font: { color: dark } } });
+candidates.getRange(`D2:D${values.length + 1}`).conditionalFormats.add('containsText', { text: '공공', format: { fill: palePrimary, font: { color: primary } } });
+candidates.getRange(`O2:O${values.length + 1}`).conditionalFormats.add('containsText', { text: '미확인', format: { fill: paleSecondary, font: { color: dark } } });
 
 queue.showGridLines = false;
 const qHeaders = ['ID','프로그램명','장소명','소개 링크','예약 링크','현재 정보 상태','재확인 필요일','발행 가능 판정','발행 전 확인 메모'];
@@ -92,7 +92,7 @@ queue.getRange('A1:I1').format.rowHeight = 42;
 queue.tables.add(`A1:I${qValues.length+1}`,true,'RecheckQueue');
 queue.getRange(`H2:H${qValues.length+1}`).dataValidation = { rule: { type: 'list', values: ['보류','발행 가능','마감','종료','정보 불충분'] } };
 queue.getRange(`H2:H${qValues.length+1}`).conditionalFormats.add('containsText',{text:'발행 가능',format:{fill:'#E8F5EA',font:{bold:true,color:'#28713A'}}});
-queue.getRange(`H2:H${qValues.length+1}`).conditionalFormats.add('containsText',{text:'보류',format:{fill:palePink,font:{bold:true,color:dark}}});
+queue.getRange(`H2:H${qValues.length+1}`).conditionalFormats.add('containsText',{text:'보류',format:{fill:paleSecondary,font:{bold:true,color:dark}}});
 queue.freezePanes.freezeRows(1);
 
 dict.showGridLines = false;
