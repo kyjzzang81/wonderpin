@@ -4,7 +4,9 @@
 
 ## Active
 
-없음.
+| ID | 업무 | 담당 | 우선순위 | 목표일 | 상세 |
+| --- | --- | --- | --- | --- | --- |
+| WP-007 | 이번 주 원더핀 프로그램 후보 100건 조사와 재사용 수집 체계 | data-researcher | P0 | 2026-07-17 | `tasks/active/WP-007-weekly-wonderpin-program-research.md` |
 
 ## Backlog
 
