@@ -4,6 +4,7 @@ node_modules/
 dist/
 coverage/
 .turbo/
+*.tsbuildinfo
 
 # Local environment and secrets
 .env
@@ -17,3 +18,5 @@ coverage/
 # Local temporary outputs
 tmp/
 
+# Local Wonder Mission editor uploads
+data/wonder-missions/uploads/

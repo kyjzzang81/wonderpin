@@ -1,0 +1,21 @@
+{
+  "name": "wonderpin",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "npm@11.4.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace @wonderpin/web",
+    "dev:admin": "npm run dev --workspace @wonderpin/admin",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

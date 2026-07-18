@@ -3,10 +3,12 @@ import { SpreadsheetFile, Workbook } from '@oai/artifact-tool';
 
 const root = new URL('..', import.meta.url).pathname;
 const sourcePath = `${root}research/programs/weekly-wonderpin-program-candidates.json`;
-const outputDir = `${root}outputs/weekly-wonderpin-20260716`;
 const source = JSON.parse(await fs.readFile(sourcePath, 'utf8'));
 const rows = source.candidates;
+const outputDir = `${root}outputs/weekly-wonderpin-${source.as_of.replaceAll('-', '')}`;
 const endRow = rows.length + 1;
+const publicCount = rows.filter((row) => row.public_private === '공공').length;
+const privateCount = rows.filter((row) => row.public_private === '사설').length;
 const wb = Workbook.create();
 const summary = wb.worksheets.add('사용 안내');
 const candidates = wb.worksheets.add('프로그램 후보');
@@ -29,7 +31,7 @@ function styleHeader(sheet, range) {
 
 summary.showGridLines = false;
 summary.mergeCells('A1:H1');
-summary.getRange('A1').values = [['이번 주 원더핀 · 프로그램 후보 풀']];
+summary.getRange('A1').values = [['이주의 원더핀 · 프로그램 후보 풀']];
 styleTitle(summary, 'A1:H1');
 summary.getRange('A1:H1').format.rowHeight = 32;
 summary.mergeCells('A3:H4');
@@ -56,7 +58,7 @@ summary.getRange('A10:H14').values = [
 ];
 summary.getRange('A10:H14').format = { wrapText: true, verticalAlignment: 'center' };
 summary.getRange('A16:H16').merge();
-summary.getRange('A16').values = [['품질 상태: 공공 80건은 기관 진입점 후보, 사설 12건은 운영자 프로그램 후보입니다. 모든 사설 행도 회차·잔여석·후기 상태를 발행 전에 재확인해야 합니다.']];
+summary.getRange('A16').values = [[`품질 상태: 공공 ${publicCount}건, 사설 ${privateCount}건입니다. 기관 진입점 후보와 세부 조건 미확인 행은 발행할 수 없으며, 모든 사설 행도 회차·잔여석·후기 상태를 발행 전에 재확인해야 합니다.`]];
 summary.getRange('A16:H16').format = { fill: paleSecondary, font: { bold: true, color: dark }, wrapText: true, borders: { preset: 'outside', style: 'thin', color: secondary } };
 for (const c of ['A','B','C','D','E','F','G','H']) summary.getRange(`${c}:${c}`).format.columnWidth = c === 'A' ? 26 : 18;
 summary.getRange('A3:H4').format.rowHeight = 32;
