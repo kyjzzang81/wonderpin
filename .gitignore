@@ -17,6 +17,3 @@ coverage/
 
 # Local temporary outputs
 tmp/
-
-# Local Wonder Mission editor uploads
-data/wonder-missions/uploads/

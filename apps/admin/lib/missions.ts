@@ -1,3 +1,7 @@
-import { createWonderMissionStore } from '@wonderpin/database/wonder-missions';
-
-export const missionStore = createWonderMissionStore();
+export {
+  createWonderMission,
+  getAdminWonderMission,
+  listAdminWonderMissions,
+  listWonderMissionAssets,
+  updateWonderMission,
+} from '@wonderpin/database/wonder-missions';

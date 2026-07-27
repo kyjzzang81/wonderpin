@@ -1,29 +1,31 @@
-import { randomUUID } from 'node:crypto';
-import fs from 'node:fs/promises';
-import path from 'node:path';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from './types';
 
-export interface WonderMission {
-  id: string;
-  title: string;
-  recommended_age: string;
-  content: string;
-  created_at: string;
-  updated_at: string;
-}
+export type WonderMissionStatus = Database['public']['Enums']['wonder_mission_status'];
+export type WonderpinAdminRole = Database['public']['Enums']['wonderpin_admin_role'];
+export type WonderMissionAssetKind = Database['public']['Enums']['wonder_mission_asset_kind'];
+export type WonderMission = Database['public']['Tables']['wonder_missions']['Row'];
+export type WonderMissionAsset = Database['public']['Tables']['wonder_mission_assets']['Row'];
 
 export interface WonderMissionInput {
   title?: unknown;
   recommended_age?: unknown;
+  thumbnail_path?: unknown;
   content?: unknown;
+  status?: unknown;
 }
 
-interface WonderMissionPayload {
-  version: 1;
-  updated_at: string | null;
-  missions: WonderMission[];
+export interface NormalizedWonderMission {
+  title: string;
+  recommended_age: string;
+  thumbnail_path: string | null;
+  content: string;
+  status: WonderMissionStatus;
 }
 
-const DEFAULT_PAYLOAD: WonderMissionPayload = { version: 1, updated_at: null, missions: [] };
+const MISSION_ASSET_PATH = /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(?:png|jpg|gif|webp)$/i;
+const MISSION_ASSET_URL = /^\/api\/mission-assets\?path=([^#&]+)$/;
+const ALLOWED_STATUSES = new Set<WonderMissionStatus>(['draft', 'published', 'archived']);
 const ALLOWED_TAGS = new Set([
   'p', 'br', 'strong', 'em', 'u', 'h2', 'h3', 'ul', 'ol', 'li',
   'blockquote', 'figure', 'figcaption', 'img', 'a',
@@ -36,12 +38,26 @@ function escapeAttribute(value: unknown) {
   })[character] ?? character);
 }
 
+export function isMissionAssetPath(value: unknown): value is string {
+  return typeof value === 'string' && MISSION_ASSET_PATH.test(value);
+}
+
+export function missionAssetUrl(objectPath: string) {
+  if (!isMissionAssetPath(objectPath)) throw new Error('올바르지 않은 원더미션 이미지 경로입니다.');
+  return `/api/mission-assets?path=${encodeURIComponent(objectPath)}`;
+}
+
 function safeUrl(value: unknown, kind: 'image' | 'link') {
   const url = String(value || '').trim();
-  if (kind === 'image') {
-    return url.startsWith('/mission-media/') || /^https:\/\//i.test(url) ? url : '';
+  if (kind === 'link') return /^https?:\/\//i.test(url) ? url : '';
+  const match = url.match(MISSION_ASSET_URL);
+  if (!match) return '';
+  try {
+    const objectPath = decodeURIComponent(match[1]);
+    return isMissionAssetPath(objectPath) ? missionAssetUrl(objectPath) : '';
+  } catch {
+    return '';
   }
-  return /^https?:\/\//i.test(url) ? url : '';
 }
 
 /** Keep mission HTML portable and safe to render on the public website. */
@@ -76,115 +92,138 @@ export function sanitizeMissionHtml(input: unknown) {
   }).trim();
 }
 
-export function normalizeMission(input: WonderMissionInput, existing: Partial<WonderMission> = {}): WonderMission {
-  const now = new Date().toISOString();
+export function normalizeMission(
+  input: WonderMissionInput,
+  existing: Partial<WonderMission> = {},
+): NormalizedWonderMission {
   const title = String(input.title ?? existing.title ?? '').normalize('NFKC').trim().slice(0, 120);
   const recommendedAge = String(input.recommended_age ?? existing.recommended_age ?? '').normalize('NFKC').trim().slice(0, 80);
   const content = sanitizeMissionHtml(input.content ?? existing.content ?? '');
+  const rawThumbnail = input.thumbnail_path === null
+    ? null
+    : String(input.thumbnail_path ?? existing.thumbnail_path ?? '').trim() || null;
+  const rawStatus = String(input.status ?? existing.status ?? 'draft') as WonderMissionStatus;
+
   if (!title) throw new Error('원더미션명을 입력해 주세요.');
   if (!recommendedAge) throw new Error('권장연령을 입력해 주세요.');
-  if (!content.replace(/<[^>]*>/g, '').trim() && !content.includes('<img')) throw new Error('원더미션 내용을 입력해 주세요.');
+  if (!content.replace(/<[^>]*>/g, '').trim() && !content.includes('<img')) {
+    throw new Error('원더미션 내용을 입력해 주세요.');
+  }
+  if (rawThumbnail && !isMissionAssetPath(rawThumbnail)) throw new Error('올바르지 않은 썸네일 경로입니다.');
+  if (!ALLOWED_STATUSES.has(rawStatus)) throw new Error('올바르지 않은 공개 상태입니다.');
+
   return {
-    id: existing.id || randomUUID(),
     title,
     recommended_age: recommendedAge,
+    thumbnail_path: rawThumbnail,
     content,
-    created_at: existing.created_at || now,
-    updated_at: now,
+    status: rawStatus,
   };
 }
 
-export function findRepositoryRoot(start = process.cwd()) {
-  if (path.basename(start) === 'wonderpin') return start;
-  // The workspace scripts always run Next from apps/<name>. Ignore this development
-  // repository lookup during output tracing; runtime data is intentionally external.
-  return path.resolve(/* turbopackIgnore: true */ start, '../..');
+function unwrap<T>(data: T | null, error: { message: string } | null): T {
+  if (error) throw new Error(error.message);
+  if (data === null) throw new Error('Supabase가 데이터를 반환하지 않았습니다.');
+  return data;
 }
 
-export function wonderMissionPaths() {
-  const root = findRepositoryRoot();
-  const storagePath = path.resolve(/* turbopackIgnore: true */ process.env.WONDERPIN_MISSIONS_PATH || path.join(root, 'data/wonder-missions/wonder-missions.json'));
-  const uploadsPath = path.resolve(/* turbopackIgnore: true */ process.env.WONDERPIN_MISSION_UPLOADS_DIR || path.join(path.dirname(storagePath), 'uploads'));
-  return { root, storagePath, uploadsPath };
+export async function listPublishedWonderMissions(client: SupabaseClient<Database>) {
+  const { data, error } = await client
+    .from('wonder_missions')
+    .select('*')
+    .eq('status', 'published')
+    .order('updated_at', { ascending: false });
+  return unwrap(data, error);
 }
 
-export function createWonderMissionStore(file = wonderMissionPaths().storagePath) {
-  const storagePath = path.resolve(file);
-
-  async function read(): Promise<WonderMissionPayload> {
-    try {
-      const parsed = JSON.parse(await fs.readFile(storagePath, 'utf8')) as Partial<WonderMissionPayload>;
-      return { ...DEFAULT_PAYLOAD, ...parsed, missions: Array.isArray(parsed.missions) ? parsed.missions : [] };
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code === 'ENOENT') return structuredClone(DEFAULT_PAYLOAD);
-      throw error;
-    }
-  }
-
-  async function write(missions: WonderMission[]) {
-    const payload: WonderMissionPayload = { version: 1, updated_at: new Date().toISOString(), missions };
-    const temporary = `${storagePath}.${process.pid}.${randomUUID()}.tmp`;
-    await fs.mkdir(path.dirname(storagePath), { recursive: true });
-    await fs.writeFile(temporary, `${JSON.stringify(payload, null, 2)}\n`, { mode: 0o600 });
-    await fs.rename(temporary, storagePath);
-    return payload;
-  }
-
-  return {
-    storagePath,
-    async list() {
-      const payload = await read();
-      return [...payload.missions].sort((a, b) => String(b.updated_at).localeCompare(String(a.updated_at)));
-    },
-    async get(id: string) {
-      return (await read()).missions.find((mission) => mission.id === id) || null;
-    },
-    async create(input: WonderMissionInput) {
-      const payload = await read();
-      const mission = normalizeMission(input);
-      await write([mission, ...payload.missions]);
-      return mission;
-    },
-    async update(id: string, input: WonderMissionInput) {
-      const payload = await read();
-      const index = payload.missions.findIndex((mission) => mission.id === id);
-      if (index < 0) return null;
-      const mission = normalizeMission(input, payload.missions[index]);
-      payload.missions[index] = mission;
-      await write(payload.missions);
-      return mission;
-    },
-    async remove(id: string) {
-      const payload = await read();
-      const mission = payload.missions.find((item) => item.id === id);
-      if (!mission) return null;
-      await write(payload.missions.filter((item) => item.id !== id));
-      return mission;
-    },
-  };
+export async function getPublishedWonderMission(client: SupabaseClient<Database>, id: string) {
+  const { data, error } = await client
+    .from('wonder_missions')
+    .select('*')
+    .eq('id', id)
+    .eq('status', 'published')
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return data;
 }
 
-const IMAGE_SIGNATURES = {
-  'image/png': { extension: '.png', valid: (body: Buffer) => body.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])) },
-  'image/jpeg': { extension: '.jpg', valid: (body: Buffer) => body[0] === 0xff && body[1] === 0xd8 && body[2] === 0xff },
-  'image/gif': { extension: '.gif', valid: (body: Buffer) => ['GIF87a', 'GIF89a'].includes(body.subarray(0, 6).toString('ascii')) },
-  'image/webp': { extension: '.webp', valid: (body: Buffer) => body.subarray(0, 4).toString('ascii') === 'RIFF' && body.subarray(8, 12).toString('ascii') === 'WEBP' },
-} as const;
+export async function listAdminWonderMissions(client: SupabaseClient<Database>) {
+  const { data, error } = await client
+    .from('wonder_missions')
+    .select('*')
+    .order('updated_at', { ascending: false });
+  return unwrap(data, error);
+}
+
+export async function getAdminWonderMission(client: SupabaseClient<Database>, id: string) {
+  const { data, error } = await client
+    .from('wonder_missions')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function createWonderMission(
+  client: SupabaseClient<Database>,
+  userId: string,
+  input: WonderMissionInput,
+) {
+  const mission = normalizeMission(input);
+  const { data, error } = await client
+    .from('wonder_missions')
+    .insert({ ...mission, created_by: userId, updated_by: userId })
+    .select()
+    .single();
+  return unwrap(data, error);
+}
+
+export async function updateWonderMission(
+  client: SupabaseClient<Database>,
+  userId: string,
+  id: string,
+  input: WonderMissionInput,
+) {
+  const existing = await getAdminWonderMission(client, id);
+  if (!existing) return null;
+  const mission = normalizeMission(input, existing);
+  const { data, error } = await client
+    .from('wonder_missions')
+    .update({ ...mission, updated_by: userId })
+    .eq('id', id)
+    .select()
+    .single();
+  return unwrap(data, error);
+}
+
+export async function listWonderMissionAssets(client: SupabaseClient<Database>, missionId: string) {
+  const { data, error } = await client
+    .from('wonder_mission_assets')
+    .select('*')
+    .eq('mission_id', missionId)
+    .order('created_at');
+  return unwrap(data, error);
+}
 
 export const MAX_MISSION_IMAGE_BYTES = 5_000_000;
+export const MISSION_MEDIA_BUCKET = 'wonder-mission-media';
 
-export function validImageExtension(contentType: string | null, body: Buffer) {
-  const type = String(contentType || '').split(';')[0].trim().toLowerCase() as keyof typeof IMAGE_SIGNATURES;
+const IMAGE_SIGNATURES = {
+  'image/png': { extension: 'png', valid: (body: Uint8Array) => body.length >= 8 && [137, 80, 78, 71, 13, 10, 26, 10].every((byte, index) => body[index] === byte) },
+  'image/jpeg': { extension: 'jpg', valid: (body: Uint8Array) => body[0] === 0xff && body[1] === 0xd8 && body[2] === 0xff },
+  'image/gif': { extension: 'gif', valid: (body: Uint8Array) => ['GIF87a', 'GIF89a'].includes(new TextDecoder('ascii').decode(body.slice(0, 6))) },
+  'image/webp': { extension: 'webp', valid: (body: Uint8Array) => new TextDecoder('ascii').decode(body.slice(0, 4)) === 'RIFF' && new TextDecoder('ascii').decode(body.slice(8, 12)) === 'WEBP' },
+} as const;
+
+export type MissionImageMimeType = keyof typeof IMAGE_SIGNATURES;
+
+export function validateMissionImage(contentType: string | null, body: Uint8Array) {
+  if (!body.length || body.length > MAX_MISSION_IMAGE_BYTES) {
+    throw new Error('이미지는 5MB 이하만 업로드할 수 있습니다.');
+  }
+  const type = String(contentType || '').split(';')[0].trim().toLowerCase() as MissionImageMimeType;
   const match = IMAGE_SIGNATURES[type];
-  return match?.valid(body) ? match.extension : null;
-}
-
-export async function saveMissionImage(contentType: string | null, body: Buffer, directory = wonderMissionPaths().uploadsPath) {
-  if (!body.length || body.length > MAX_MISSION_IMAGE_BYTES) throw new Error('이미지는 5MB 이하만 업로드할 수 있습니다.');
-  const extension = validImageExtension(contentType, body);
-  if (!extension) throw new Error('PNG, JPEG, GIF 또는 WebP 이미지 파일만 업로드할 수 있습니다.');
-  await fs.mkdir(directory, { recursive: true });
-  const filename = `${randomUUID()}${extension}`;
-  await fs.writeFile(path.join(directory, filename), body, { mode: 0o600, flag: 'wx' });
-  return { filename, url: `/mission-media/${filename}` };
+  if (!match?.valid(body)) throw new Error('PNG, JPEG, GIF 또는 WebP 이미지 파일만 업로드할 수 있습니다.');
+  return { mimeType: type, extension: match.extension };
 }

@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { findRepositoryRoot } from '@wonderpin/database/wonder-missions';
+import { findRepositoryRoot } from '@wonderpin/database/repository-root';
 
 export const dynamic = 'force-dynamic';
 

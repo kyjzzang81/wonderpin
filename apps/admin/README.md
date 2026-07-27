@@ -25,7 +25,7 @@ npm run dev:admin
 
 판정은 `research/platform-content/review-decisions.json`에 저장한다. 동일한 `source_key` 또는 제목·운영자·장소 fingerprint가 decline 상태이면 `scripts/collect-platform-programs.mjs`의 다음 실행 결과에서 제외한다.
 
-원더미션 메타데이터와 WYSIWYG HTML은 Supabase `wonder_missions` 테이블, 썸네일과 본문 이미지는 Supabase Storage에 저장한다. 프로젝트·환경변수·스키마·bucket·관리자 Auth·RLS는 `WP-017`에서 연결한다. JSON 파일이나 로컬 업로드 디렉터리를 임시 CRUD 저장소로 사용하지 않는다. 연동 전에는 로그인과 역할 권한도 없으므로 외부에 공개하면 안 된다.
+원더미션 메타데이터와 WYSIWYG HTML은 Supabase `wonder_missions` 테이블, 썸네일과 본문 이미지는 private Storage에 저장한다. `/missions`와 관련 API는 Supabase Auth 사용자와 `content_manager`/`super_admin` 역할을 서버에서 확인하고 RLS가 같은 권한을 다시 강제한다. `apps/admin/.env.example`을 참고해 공개 URL·publishable key만 `.env.local`에 설정한다. 최초 `super_admin` bootstrap과 원격 migration은 `docs/product/TECHNICAL_ARCHITECTURE.md` 절차를 따르며 사용자 승인 전에 실행하지 않는다.
 
 ## 제한
 

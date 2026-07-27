@@ -1,36 +1,41 @@
 import assert from 'node:assert/strict';
-import fs from 'node:fs/promises';
-import os from 'node:os';
-import path from 'node:path';
 import test from 'node:test';
-import { createWonderMissionStore, sanitizeMissionHtml, saveMissionImage } from '../src/wonder-missions.ts';
+import {
+  missionAssetUrl,
+  normalizeMission,
+  sanitizeMissionHtml,
+  validateMissionImage,
+} from '../src/wonder-missions.ts';
 
-test('mission CRUD persists sanitized HTML', async () => {
-  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'wonderpin-missions-'));
-  const store = createWonderMissionStore(path.join(directory, 'missions.json'));
-  const mission = await store.create({
+const assetPath = '11111111-1111-4111-8111-111111111111/22222222-2222-4222-8222-222222222222.png';
+
+test('mission normalization sanitizes HTML and validates workflow fields', () => {
+  const mission = normalizeMission({
     title: ' 바람의 흔적 찾기 ',
     recommended_age: '만 5~7세',
-    content: '<h2 onclick="bad()">시작</h2><script>alert(1)</script><p>움직이는 것을 찾아요.</p>',
+    thumbnail_path: assetPath,
+    status: 'published',
+    content: `<h2 onclick="bad()">시작</h2><script>alert(1)</script><img src="${missionAssetUrl(assetPath)}">`,
   });
   assert.equal(mission.title, '바람의 흔적 찾기');
+  assert.equal(mission.status, 'published');
+  assert.equal(mission.thumbnail_path, assetPath);
   assert.doesNotMatch(mission.content, /onclick|script|alert/);
-  assert.equal((await store.list()).length, 1);
-  assert.equal((await store.update(mission.id, { recommended_age: '만 5~8세' }))?.recommended_age, '만 5~8세');
-  assert.equal((await store.remove(mission.id))?.id, mission.id);
-  assert.equal((await store.list()).length, 0);
+  assert.match(mission.content, /loading="lazy"/);
+  assert.throws(() => normalizeMission({ ...mission, status: 'invalid' }), /공개 상태/);
 });
 
-test('sanitizer only keeps safe links and mission image sources', () => {
-  const value = sanitizeMissionHtml('<a href="javascript:bad()">bad</a><img src="/mission-media/a.png" onerror="bad()"><img src="data:x">');
-  assert.doesNotMatch(value, /javascript|onerror|data:/);
-  assert.match(value, /loading="lazy"/);
+test('sanitizer only keeps safe links and Supabase mission asset proxy sources', () => {
+  const value = sanitizeMissionHtml(
+    `<a href="javascript:bad()">bad</a><img src="${missionAssetUrl(assetPath)}" onerror="bad()"><img src="https://example.com/x.png">`,
+  );
+  assert.doesNotMatch(value, /javascript|onerror|example\.com/);
+  assert.match(value, /api\/mission-assets/);
 });
 
-test('image upload checks declared type, signature and limit', async () => {
-  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'wonderpin-images-'));
-  const png = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 0]);
-  const saved = await saveMissionImage('image/png', png, directory);
-  assert.match(saved.url, /^\/mission-media\/[a-f0-9-]+\.png$/);
-  await assert.rejects(() => saveMissionImage('image/jpeg', png, directory), /PNG, JPEG/);
+test('image validation checks declared type, signature and limit', () => {
+  const png = Uint8Array.from([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 0]);
+  assert.deepEqual(validateMissionImage('image/png', png), { mimeType: 'image/png', extension: 'png' });
+  assert.throws(() => validateMissionImage('image/jpeg', png), /PNG, JPEG/);
+  assert.throws(() => validateMissionImage('image/png', new Uint8Array()), /5MB/);
 });

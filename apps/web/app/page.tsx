@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { sanitizeMissionHtml } from '@wonderpin/database/wonder-missions';
-import { missionStore } from '@/lib/missions';
+import { missionAssetUrl, sanitizeMissionHtml } from '@wonderpin/database/wonder-missions';
+import { listMissions } from '@/lib/missions';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +14,7 @@ function firstImage(content: string) {
 }
 
 export default async function HomePage() {
-  const missions = await missionStore.list();
+  const missions = await listMissions();
   return (
     <>
       <section className="home-intro">
@@ -27,7 +27,9 @@ export default async function HomePage() {
         {missions.length ? (
           <div className="mission-grid">
             {missions.map((mission, index) => {
-              const image = firstImage(mission.content);
+              const image = mission.thumbnail_path
+                ? { src: missionAssetUrl(mission.thumbnail_path), alt: '' }
+                : firstImage(mission.content);
               return (
                 <Link className="mission-card" href={`/missions/${encodeURIComponent(mission.id)}`} key={mission.id}>
                   {image ? (

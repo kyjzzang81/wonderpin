@@ -2,7 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { findRepositoryRoot } from '@wonderpin/database/wonder-missions';
+import { findRepositoryRoot } from '@wonderpin/database/repository-root';
 
 type Program = Record<string, any>;
 type Decision = Record<string, any>;

@@ -1,6 +1,6 @@
 # 원더핀 위험 관리
 
-최종 갱신: 2026-07-18
+최종 갱신: 2026-07-27
 
 | ID | 위험 | 가능성 | 영향 | 대응 | 담당 | 상태 |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -22,5 +22,5 @@
 | R-017 | 연령별 평균 행동을 모든 아이에게 일반화하거나 현장 검증 전에 원더팩의 교육효과를 확정할 수 있음 | 중간 | 높음 | 발달 이정표를 진단·합격선으로 쓰지 않고 사실·제품 해석·가설을 분리하며, 대체 표현과 최소 개입을 설계한 뒤 전문가 검토와 가족 형성평가로 확인 | wonderpack-developer | 연구 중 |
 | R-016 | 외부 플랫폼 프로그램 큐레이션에서 마감·가격 오류, 이미지·문구 무단 이용 또는 원더핀 판매상품 오인이 발생할 수 있음 | 높음 | 높음 | 게시 당일 운영자·기관 원문 재확인, 출처·확인일·운영주체 표시, 자체 그래픽 사용, 제휴·광고 관계 표시와 비판매 고지 | social-content | 통제 필요 |
 | R-018 | 인증 없는 로컬 검수 도구가 외부 주소에 노출되거나 판정 파일이 손상될 수 있음 | 낮음 | 높음 | 서버를 `127.0.0.1`에만 바인딩하고 판정 파일을 임시 파일 작성 후 원자적으로 교체하며, 외부 배포·운영 DB 연결을 금지 | app-developer | 완화됨 |
-| R-019 | Next.js가 고정한 `postcss@8.4.31`의 moderate XSS advisory가 개발 의존 그래프에 남음 | 중간 | 중간 | high·critical 없음과 실제 CSS 입력 경계를 확인하고, 강제 major downgrade 없이 Next.js의 호환 패치 릴리스를 추적해 lockfile을 갱신 | app-developer | 추적 중 |
-| R-020 | 원더미션 UI는 있으나 Supabase Database·Storage·Auth·RLS가 연결되지 않아 미완료 CRUD가 운영 기능으로 오인될 수 있음 | 높음 | 높음 | JSON 임시 저장을 금지하고 WP-017 완료 전 외부 배포·운영 사용을 금지하며, 서버 권한과 RLS 통합 검증 후에만 CRUD를 완료 처리 | app-developer | 연동 필요 |
+| R-019 | Next.js가 고정한 `postcss@8.4.31`과 optional `sharp@0.34.5`, ESLint 도구 그래프에 high advisory가 남음 | 중간 | 높음 | Next.js 자체 권한 우회 advisory는 16.2.11로 갱신했다. 사용자 CSS·Next Image 처리 경계를 제한하고 호환 postcss·sharp와 lint 패치 릴리스를 추적한다. `npm audit` 기준 critical 0, high 8(프로덕션 3)이다. | app-developer | 추적 중 |
+| R-020 | 원더미션 UI는 있으나 Supabase Database·Storage·Auth·RLS가 운영 프로젝트에서 검증되지 않아 미완료 CRUD가 운영 기능으로 오인될 수 있음 | 중간 | 높음 | JSON·로컬 저장 실행 경로는 제거했다. Docker 기반 RLS test와 승인된 원격 migration·관리자 계정 E2E 검증 전 외부 배포·운영 사용을 금지한다. | app-developer | 로컬 구현·원격 검증 대기 |

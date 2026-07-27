@@ -1,6 +1,6 @@
 # 원더핀 업무 보드
 
-최종 갱신: 2026-07-18
+최종 갱신: 2026-07-27
 
 ## 실행 순서
 
@@ -31,7 +31,6 @@
 | WP-012 | 휴대형 야외 탐험 카드 유료 파일럿과 단위경제성 | business-strategist | P0 | 2026-09-28 | `tasks/backlog/WP-012-paid-card-pilot-and-unit-economics.md` |
 | WP-003 | 웹앱 모노레포 초기화와 3개 앱 셸 구현 | app-developer | P2 | 미정 | `tasks/backlog/WP-003-monorepo-app-shells.md` |
 | WP-005 | 인스타그램 두 정기 시리즈 4주 실행안 | social-content | P1 | 미정 | `tasks/backlog/WP-005-instagram-four-week-operation.md` |
-| WP-017 | Supabase 원더미션 저장소·관리자 권한 연동 | app-developer | P1 | 미정 | `tasks/backlog/WP-017-supabase-wonder-mission-storage.md` |
 
 ## Review
 
@@ -40,6 +39,7 @@
 | WP-014 | 아이고고·째깍악어 플랫폼 콘텐츠 수집 자동화 | social-content, data-researcher | P1 | 2026-07-17 | `tasks/review/WP-014-competitor-content-monitoring-automation.md` |
 | WP-015 | 플랫폼 프로그램 검수 관리자 도구 | app-developer | P1 | 2026-07-18 | `tasks/review/WP-015-platform-program-review-admin.md` |
 | WP-016 | 원더미션 공개 웹과 관리자 UI 기반 | app-developer | P1 | 2026-07-18 | `tasks/review/WP-016-wonder-mission-web-and-admin.md` |
+| WP-017 | Supabase 원더미션 저장소·관리자 권한 연동 | app-developer | P1 | 미정 | `tasks/review/WP-017-supabase-wonder-mission-storage.md` |
 
 ## Blocked
 

@@ -1,0 +1,1 @@
+-- Intentionally empty. Production-like content and administrator accounts are not seeded.

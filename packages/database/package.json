@@ -5,7 +5,9 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./wonder-missions": "./src/wonder-missions.ts"
+    "./repository-root": "./src/repository-root.ts",
+    "./wonder-missions": "./src/wonder-missions.ts",
+    "./types": "./src/types.ts"
   },
   "scripts": {
     "lint": "eslint src test --max-warnings=0",
@@ -15,7 +17,10 @@
   "devDependencies": {
     "@types/node": "^24.0.0",
     "eslint": "^9.0.0",
-    "typescript-eslint": "^8.0.0",
-    "typescript": "^5.8.0"
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.0.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.57.4"
   }
 }

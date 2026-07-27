@@ -1,6 +1,6 @@
 # 원더핀 기술 구조
 
-> **현재 상태(2026-07-18): 원더미션 웹 UI 기반 구현, Supabase 연동 전.** `apps/web`과 `apps/admin`의 Next.js 화면은 준비됐지만 운영 CRUD는 아직 완료되지 않았다. 원더미션의 유일한 영속 저장소는 Supabase Database·Storage로 확정하며 JSON 파일 저장소나 로컬 파일 저장을 임시 운영 방식으로 사용하지 않는다.
+> **현재 상태(2026-07-27): 원더미션 Supabase 연동 코드·migration 검토 단계.** `apps/web`과 `apps/admin`은 Supabase Database·Storage·Auth·RLS를 사용하도록 전환했고 JSON·로컬 업로드 실행 경로는 제거했다. Docker가 실행되지 않아 local RLS test와 승인된 원격 migration·계정 E2E는 아직 완료되지 않았으므로 운영 CRUD로 간주하거나 배포하지 않는다.
 
 ## 1. 제품 구성
 
@@ -23,7 +23,7 @@
 - 결제: 국내 결제 제공자 검토 후 결정
 - 이메일·문자·알림: MVP 운영 정책과 개인정보 검토 후 결정
 
-현재 패키지 관리자는 npm workspaces, 프론트엔드·서버는 Next.js App Router와 TypeScript로 확정했다. Supabase 프로젝트 생성, 환경변수, 스키마, Storage bucket, Auth와 RLS 정책은 `WP-017`에서 구현·검증한다. 연동 전 관리자 CRUD는 운영 가능 상태로 간주하지 않는다.
+현재 패키지 관리자는 npm workspaces, 프론트엔드·서버는 Next.js App Router와 TypeScript로 확정했다. Supabase schema, private Storage bucket, Auth와 RLS 정책의 local migration은 `WP-017`에 구현되어 있다. 승인된 원격 적용과 권한별 E2E 전 관리자 CRUD는 운영 가능 상태로 간주하지 않는다.
 
 ### 원더미션 저장 원칙
 
@@ -33,6 +33,36 @@
 - 관리자 쓰기는 Supabase Auth 사용자 중 `content_manager` 또는 `super_admin` 역할만 허용한다.
 - 브라우저 화면 숨김이 아니라 Route Handler·서버 데이터 계층과 RLS에서 권한을 검증한다.
 - JSON 파일, repository 파일과 로컬 업로드 디렉터리는 운영·임시 CRUD 저장소로 사용하지 않는다.
+
+### Supabase 환경과 최초 관리자 설정
+
+두 Next.js 앱은 다음 공개 환경변수만 사용한다. secret/service-role key로 관리자 CRUD를 우회하지 않는다.
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_KEY
+```
+
+로컬에서는 Docker를 실행한 뒤 아래 순서로 migration과 RLS test를 확인한다.
+
+```bash
+supabase start
+supabase db reset
+supabase test db
+```
+
+첫 관리자 역할은 아직 `super_admin`이 없어 애플리케이션 RLS로 생성할 수 없다. Auth 사용자를 먼저 만든 다음, 사용자 승인 하에 Supabase Dashboard SQL Editor에서 한 번 bootstrap한다. 아래 SQL의 이메일은 실제 관리자 계정으로 바꿔야 한다.
+
+```sql
+insert into public.admin_user_roles (user_id, role)
+select id, 'super_admin'::public.wonderpin_admin_role
+from auth.users
+where email = 'ADMIN_EMAIL'
+on conflict (user_id) do update
+set role = excluded.role;
+```
+
+이 SQL과 `supabase db push`는 운영 데이터베이스 변경이므로 사용자 승인 전 실행하지 않는다.
 
 ## 3. 공유 패키지
 

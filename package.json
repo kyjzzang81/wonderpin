@@ -17,5 +17,11 @@
   },
   "engines": {
     "node": ">=20.9.0"
+  },
+  "overrides": {
+    "@supabase/supabase-js": "2.57.4"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.57.4"
   }
 }
