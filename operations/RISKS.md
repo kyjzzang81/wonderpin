@@ -23,4 +23,4 @@
 | R-016 | 외부 플랫폼 프로그램 큐레이션에서 마감·가격 오류, 이미지·문구 무단 이용 또는 원더핀 판매상품 오인이 발생할 수 있음 | 높음 | 높음 | 게시 당일 운영자·기관 원문 재확인, 출처·확인일·운영주체 표시, 자체 그래픽 사용, 제휴·광고 관계 표시와 비판매 고지 | social-content | 통제 필요 |
 | R-018 | 인증 없는 로컬 검수 도구가 외부 주소에 노출되거나 판정 파일이 손상될 수 있음 | 낮음 | 높음 | 서버를 `127.0.0.1`에만 바인딩하고 판정 파일을 임시 파일 작성 후 원자적으로 교체하며, 외부 배포·운영 DB 연결을 금지 | app-developer | 완화됨 |
 | R-019 | Next.js가 고정한 `postcss@8.4.31`과 optional `sharp@0.34.5`, ESLint 도구 그래프에 high advisory가 남음 | 중간 | 높음 | Next.js 자체 권한 우회 advisory는 16.2.11로 갱신했다. 사용자 CSS·Next Image 처리 경계를 제한하고 호환 postcss·sharp와 lint 패치 릴리스를 추적한다. `npm audit` 기준 critical 0, high 8(프로덕션 3)이다. | app-developer | 추적 중 |
-| R-020 | 원더미션 UI는 있으나 Supabase Database·Storage·Auth·RLS가 운영 프로젝트에서 검증되지 않아 미완료 CRUD가 운영 기능으로 오인될 수 있음 | 중간 | 높음 | JSON·로컬 저장 실행 경로는 제거했다. Docker 기반 RLS test와 승인된 원격 migration·관리자 계정 E2E 검증 전 외부 배포·운영 사용을 금지한다. | app-developer | 로컬 구현·원격 검증 대기 |
+| R-020 | 원더미션 UI는 있으나 Supabase Database·Storage·Auth·RLS가 운영 프로젝트에서 검증되지 않아 미완료 CRUD가 운영 기능으로 오인될 수 있음 | 중간 | 높음 | JSON·로컬 저장 실행 경로는 제거했고 local DB reset과 RLS test 8건을 통과했다. 승인된 원격 migration·관리자 계정 E2E 검증 전 외부 배포·운영 사용을 금지한다. | app-developer | 로컬 검증 완료·원격 검증 대기 |

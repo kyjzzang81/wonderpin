@@ -1,6 +1,6 @@
 # 원더핀 기술 구조
 
-> **현재 상태(2026-07-27): 원더미션 Supabase 연동 코드·migration 검토 단계.** `apps/web`과 `apps/admin`은 Supabase Database·Storage·Auth·RLS를 사용하도록 전환했고 JSON·로컬 업로드 실행 경로는 제거했다. Docker가 실행되지 않아 local RLS test와 승인된 원격 migration·계정 E2E는 아직 완료되지 않았으므로 운영 CRUD로 간주하거나 배포하지 않는다.
+> **현재 상태(2026-07-27): 원더미션 Supabase 연동 코드·migration 검토 단계.** `apps/web`과 `apps/admin`은 Supabase Database·Storage·Auth·RLS를 사용하도록 전환했고 JSON·로컬 업로드 실행 경로는 제거했다. Local DB reset과 RLS test 8건은 통과했지만 승인된 원격 migration·계정 E2E는 아직 완료되지 않았으므로 운영 CRUD로 간주하거나 배포하지 않는다.
 
 ## 1. 제품 구성
 

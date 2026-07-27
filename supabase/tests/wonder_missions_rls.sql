@@ -1,7 +1,7 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
-select plan(6);
+select plan(8);
 
 insert into auth.users (id, email)
 values
@@ -40,10 +40,13 @@ select extensions.is(
   1::bigint,
   'anonymous users only read published missions'
 );
-select extensions.throws_ok(
+select extensions.lives_ok(
   $$delete from public.wonder_missions where id = '20000000-0000-4000-8000-000000000001'$$,
-  '42501',
-  null,
+  'anonymous delete is safely filtered by RLS'
+);
+select extensions.is(
+  (select count(*) from public.wonder_missions),
+  1::bigint,
   'anonymous users cannot delete missions'
 );
 
@@ -56,10 +59,17 @@ select extensions.is(
   1::bigint,
   'authenticated users without an admin role only read published missions'
 );
-select extensions.throws_ok(
+select extensions.lives_ok(
   $$update public.wonder_missions set title = '변조' where id = '20000000-0000-4000-8000-000000000001'$$,
-  '42501',
-  null,
+  'unauthorized update is safely filtered by RLS'
+);
+select extensions.is(
+  (
+    select title
+    from public.wonder_missions
+    where id = '20000000-0000-4000-8000-000000000001'
+  ),
+  '공개 미션',
   'authenticated users without an admin role cannot update missions'
 );
 

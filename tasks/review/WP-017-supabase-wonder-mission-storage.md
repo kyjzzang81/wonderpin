@@ -58,12 +58,12 @@
 - `npm test`: 3/3 통과
 - `npm run build`: 관리자 로그인 페이지의 Suspense 요구로 최초 실패했으나 수정 후 Next.js `16.2.11`에서 관리자·가족용 웹 모두 통과
 - `npm audit`: high 8건, critical 0건. 프로덕션 그래프에는 Next.js가 고정한 `postcss@8.4.31`, optional `sharp@0.34.5` 관련 high 3건이 남고 나머지는 lint 개발 도구 그래프다.
-- Supabase local migration·RLS test: 미검증. Docker daemon이 실행 중이 아니어서 `supabase status`가 실패했다.
+- `supabase db reset`: 통과. 빈 로컬 DB에 migration과 seed가 재현 가능하게 적용됐다.
+- `supabase test db`: 역할별 RLS 테스트 8/8 통과
 - 원격 migration과 Storage/RLS 적용: 사용자 승인 전 실행하지 않음
 
 ## 남은 완료 조건과 위험
 
-- Docker 실행 후 `supabase db reset`, `supabase test db`로 migration과 역할별 RLS를 검증해야 한다.
 - 승인된 원격 프로젝트에 migration을 적용하고 첫 `super_admin` 역할을 bootstrap해야 한다.
 - 실제 관리자 계정으로 초안 작성 → 이미지 업로드 → 공개 → 가족용 목록·상세 조회 → 삭제 흐름을 검증해야 한다.
 - 첫 관리자 역할은 기존 super admin이 없으므로 Dashboard SQL Editor 또는 별도 승인된 관리 경로에서 한 번 bootstrap해야 한다.
