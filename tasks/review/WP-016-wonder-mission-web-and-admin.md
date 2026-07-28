@@ -59,6 +59,11 @@
 - 저장소 통합 `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`: 모두 통과. `@wonderpin/admin`, `@wonderpin/web` production build를 함께 확인했다.
 - 브라우저 검수: 390px 홈·상세 1열, 768px 2열, 1280px 3열을 확인했고 각 너비에서 가로 overflow가 없었다.
 
+### 2026-07-28 래스터 그래픽 적용
+
+- CSS 도형으로 만들었던 홈·상세 장식을 원더핀 색상의 투명 배경 3D 클레이 PNG 2종으로 교체했다.
+- 원본 자산은 `assets/web-graphics/wonder-mission/`에서 관리하고, 공개 웹은 파일명 허용 목록이 있는 읽기 전용 Route Handler로 제공한다.
+
 ## 남은 위험과 승인 항목
 
 - 공식 원더핀 Instagram URL이 저장소에 없어 추정하지 않았다. `WONDERPIN_INSTAGRAM_URL` 미설정 시 아이콘은 `aria-disabled` 상태다.

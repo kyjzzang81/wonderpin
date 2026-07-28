@@ -55,6 +55,9 @@
 
 | 대표 결과물 | 들어 있는 내용 | 필요할 때 | 상태 | 관련 업무·주의 |
 | --- | --- | --- | --- | --- |
+| [`assets/web-graphics/wonder-mission/`](../assets/web-graphics/wonder-mission/) | 원더미션 공개 웹에서 재사용하는 투명 배경 래스터 그래픽 모음 | 홈·상세의 탐험 분위기 그래픽을 구성할 때 | 사용 중 | WP-016, 2026-07-28 생성; SVG가 아닌 PNG 원본 |
+| [`assets/web-graphics/wonder-mission/hero-explorer.png`](../assets/web-graphics/wonder-mission/hero-explorer.png) | 돋보기·별·링·조약돌을 조합한 투명 배경 3D 클레이 그래픽 | 공개 웹 홈 히어로를 구성할 때 | 사용 중 | WP-016, 2026-07-28 생성; 이미지 생성 후 크로마키 제거 |
+| [`assets/web-graphics/wonder-mission/discovery-sprout.png`](../assets/web-graphics/wonder-mission/discovery-sprout.png) | 새싹·씨앗·별을 조합한 투명 배경 3D 클레이 그래픽 | 원더미션 상세 히어로를 장식할 때 | 사용 중 | WP-016, 2026-07-28 생성; 이미지 생성 후 크로마키 제거 |
 | [`output/pdf/child-development-mission-design-textbook.pdf`](../output/pdf/child-development-mission-design-textbook.pdf) | 아동 발달 자습서의 45쪽 휴대·열람용 PDF | Markdown 대신 인쇄·태블릿·이동 중 학습용 파일이 필요할 때 | 현장 검증 전 | 원본은 `CHILD_DEVELOPMENT_MISSION_DESIGN_TEXTBOOK.md`; 내용 수정 후 PDF도 재생성 |
 | [`outputs/weekly-wonderpin-20260716/README.md`](../outputs/weekly-wonderpin-20260716/README.md) | 과거 프로그램 후보 98건 워크북과 미리보기의 생성 배경·사용 금지 사유 | 당시 워크북 생성 결과를 재현하거나 형식을 참고할 때 | 과거 스냅샷 | 현재 게시용 금지; 당주 정보로 다시 생성·검수 |
 

@@ -190,96 +190,14 @@ main {
   min-height: 430px;
 }
 
-.discovery-scene > span {
+.discovery-scene img {
   position: absolute;
-  display: block;
-}
-
-.scene-sun {
-  top: 12%;
-  right: 4%;
-  width: 128px;
-  aspect-ratio: 1;
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 32% 27%, #fff 0, #ffef9f 19%, #f3b806 69%, #d68900 100%);
-  box-shadow:
-    0 22px 55px rgba(80, 54, 0, 0.22),
-    0 0 70px rgba(255, 233, 95, 0.42);
-}
-
-.scene-ring {
-  top: 43%;
-  left: 13%;
-  width: 188px;
-  height: 188px;
-  border: 42px solid rgba(225, 244, 255, 0.86);
-  border-radius: 50%;
-  box-shadow:
-    0 28px 48px rgba(12, 66, 145, 0.24),
-    inset 12px 10px 18px rgba(255, 255, 255, 0.68),
-    inset -12px -10px 18px rgba(44, 107, 208, 0.25);
-  transform: rotateX(54deg) rotateZ(-23deg);
-}
-
-.scene-leaf {
-  width: 100px;
-  height: 156px;
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  border-radius: 100% 0 100% 0;
-  background:
-    linear-gradient(45deg, rgba(255, 255, 255, 0.5), transparent 42%),
-    linear-gradient(135deg, #baf68b, #3fd1b4 62%, #03a27e);
-  box-shadow: 0 22px 44px rgba(0, 83, 106, 0.2);
-}
-
-.scene-leaf::after {
-  position: absolute;
-  top: 21%;
-  left: 48%;
-  width: 2px;
-  height: 72%;
-  content: "";
-  background: rgba(255, 255, 255, 0.53);
-  transform: rotate(41deg);
-  transform-origin: top;
-}
-
-.scene-leaf-one {
-  right: 7%;
-  bottom: 5%;
-  transform: rotate(27deg);
-}
-
-.scene-leaf-two {
-  top: 4%;
-  left: 6%;
-  width: 52px;
-  height: 82px;
-  opacity: 0.76;
-  transform: rotate(-37deg);
-}
-
-.scene-trail {
-  right: 23%;
-  bottom: 8%;
-  width: 120px;
-  height: 120px;
-  border: 3px solid rgba(255, 255, 255, 0.34);
-  border-right-color: transparent;
-  border-bottom-color: transparent;
-  border-radius: 50%;
-  transform: rotate(-34deg);
-}
-
-.scene-star {
-  top: 29%;
-  right: 18%;
-  color: var(--wonder-red);
-  font-size: 46px;
-  text-shadow: 0 14px 24px rgba(129, 0, 10, 0.2);
-  transform: rotate(13deg);
+  top: 50%;
+  left: 50%;
+  width: min(125%, 590px);
+  height: auto;
+  filter: drop-shadow(0 28px 36px rgba(8, 49, 111, 0.24));
+  transform: translate(-50%, -50%) rotate(-4deg);
 }
 
 /* Mission list */
@@ -681,43 +599,15 @@ main {
   word-break: keep-all;
 }
 
-.detail-scene > span {
+.detail-scene img {
   position: absolute;
-  display: block;
-}
-
-.detail-orbit {
-  top: 80px;
-  right: 8%;
-  width: 150px;
-  aspect-ratio: 1;
-  border: 34px solid rgba(235, 248, 255, 0.84);
-  border-radius: 50%;
-  box-shadow:
-    0 22px 44px rgba(7, 60, 128, 0.2),
-    inset 8px 8px 14px rgba(18, 99, 200, 0.16);
-  transform: rotateX(58deg) rotateZ(-24deg);
-}
-
-.detail-leaf {
-  right: 15%;
-  bottom: 39px;
-  width: 68px;
-  height: 104px;
-  border-radius: 100% 0 100% 0;
-  background: linear-gradient(145deg, #c7f794, #45cda5);
-  box-shadow: 0 18px 35px rgba(0, 75, 72, 0.18);
-  transform: rotate(31deg);
-}
-
-.detail-dot {
-  top: 71px;
-  right: 28%;
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  background: var(--wonder-red);
-  box-shadow: 0 12px 20px rgba(103, 0, 5, 0.2);
+  right: 2%;
+  bottom: -54px;
+  width: min(31vw, 360px);
+  height: auto;
+  opacity: 0.92;
+  filter: drop-shadow(0 24px 32px rgba(5, 45, 101, 0.2));
+  transform: rotate(8deg);
 }
 
 .detail-paper {
@@ -931,15 +821,8 @@ a.instagram-button:hover {
     min-height: 390px;
   }
 
-  .scene-sun {
-    width: 104px;
-  }
-
-  .scene-ring {
-    left: 1%;
-    width: 155px;
-    height: 155px;
-    border-width: 35px;
+  .discovery-scene img {
+    width: 145%;
   }
 
   .mission-grid {
@@ -950,8 +833,9 @@ a.instagram-button:hover {
     max-width: 620px;
   }
 
-  .detail-orbit {
-    right: 4%;
+  .detail-scene img {
+    right: -5%;
+    width: 290px;
     opacity: 0.65;
   }
 }
@@ -991,36 +875,8 @@ a.instagram-button:hover {
     min-height: 230px;
   }
 
-  .scene-sun {
-    top: 8px;
-    width: 74px;
-  }
-
-  .scene-ring {
-    top: 29%;
-    left: -28%;
-    width: 126px;
-    height: 126px;
-    border-width: 29px;
-  }
-
-  .scene-leaf-one {
-    width: 67px;
-    height: 104px;
-  }
-
-  .scene-leaf-two {
-    display: none !important;
-  }
-
-  .scene-star {
-    top: 24%;
-    right: 9%;
-    font-size: 32px;
-  }
-
-  .scene-trail {
-    display: none !important;
+  .discovery-scene img {
+    width: 138%;
   }
 
   .mission-section {
@@ -1059,23 +915,10 @@ a.instagram-button:hover {
     font-size: clamp(42px, 12vw, 60px);
   }
 
-  .detail-orbit {
-    top: 76px;
-    right: -22px;
-    width: 122px;
-    border-width: 28px;
-  }
-
-  .detail-leaf {
-    right: 11%;
-    bottom: 28px;
-    width: 48px;
-    height: 74px;
-  }
-
-  .detail-dot {
-    top: 62px;
-    right: 27%;
+  .detail-scene img {
+    right: -55px;
+    bottom: -28px;
+    width: 220px;
   }
 
   .detail-paper {
@@ -1132,21 +975,8 @@ a.instagram-button:hover {
     min-height: 195px;
   }
 
-  .scene-ring {
-    left: -35%;
-    width: 108px;
-    height: 108px;
-    border-width: 25px;
-  }
-
-  .scene-sun {
-    width: 65px;
-  }
-
-  .scene-leaf-one {
-    right: 4%;
-    width: 56px;
-    height: 87px;
+  .discovery-scene img {
+    width: 145%;
   }
 
   .mission-section {

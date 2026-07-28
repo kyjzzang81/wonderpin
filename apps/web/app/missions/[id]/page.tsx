@@ -26,9 +26,9 @@ export default async function MissionDetailPage({ params }: Props) {
           <h1>{mission.title}</h1>
         </header>
         <div className="detail-scene" aria-hidden="true">
-          <span className="detail-orbit" />
-          <span className="detail-leaf" />
-          <span className="detail-dot" />
+          {/* Decorative raster artwork is maintained in the repository asset library. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/web-graphics/wonder-mission/discovery-sprout.png" alt="" />
         </div>
       </section>
       <section className="detail-paper" aria-label="원더미션 내용">

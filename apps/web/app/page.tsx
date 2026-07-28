@@ -27,12 +27,9 @@ export default async function HomePage() {
           </a>
         </div>
         <div className="discovery-scene" aria-hidden="true">
-          <span className="scene-sun" />
-          <span className="scene-ring" />
-          <span className="scene-leaf scene-leaf-one" />
-          <span className="scene-leaf scene-leaf-two" />
-          <span className="scene-trail" />
-          <span className="scene-star">✦</span>
+          {/* Decorative raster artwork is maintained in the repository asset library. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/web-graphics/wonder-mission/hero-explorer.png" alt="" />
         </div>
       </section>
       <section className="mission-section" aria-labelledby="mission-list-title">
