@@ -7,6 +7,10 @@ import {
   type WonderMissionStatus,
   type WonderpinAdminRole,
 } from '@wonderpin/database/wonder-missions';
+import Image from '@tiptap/extension-image';
+import Placeholder from '@tiptap/extension-placeholder';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -43,9 +47,22 @@ export default function MissionManager({ userEmail, role }: MissionManagerProps)
   const [thumbnailPath, setThumbnailPath] = useState<string | null>(null);
   const [notice, setNotice] = useState('');
   const [saving, setSaving] = useState(false);
-  const editor = useRef<HTMLDivElement>(null);
   const bodyImageInput = useRef<HTMLInputElement>(null);
   const thumbnailInput = useRef<HTMLInputElement>(null);
+  const editor = useEditor({
+    immediatelyRender: false,
+    extensions: [
+      StarterKit.configure({ heading: { levels: [2, 3] } }),
+      Image.configure({ allowBase64: false, inline: false }),
+      Placeholder.configure({ placeholder: '카드뉴스 이미지와 안내 문구를 입력하세요.' }),
+    ],
+    editorProps: {
+      attributes: {
+        class: 'content-editor',
+        'aria-label': '원더미션 내용',
+      },
+    },
+  });
 
   async function loadMissions() {
     const data = await api<{ items: WonderMission[] }>('/api/missions');
@@ -66,7 +83,7 @@ export default function MissionManager({ userEmail, role }: MissionManagerProps)
     setPublicationStatus('draft');
     setThumbnailPath(null);
     setNotice('');
-    if (editor.current) editor.current.innerHTML = '';
+    editor?.commands.clearContent();
   }
 
   function selectMission(mission: WonderMission) {
@@ -76,13 +93,8 @@ export default function MissionManager({ userEmail, role }: MissionManagerProps)
     setPublicationStatus(mission.status);
     setThumbnailPath(mission.thumbnail_path);
     setNotice('');
-    if (editor.current) editor.current.innerHTML = mission.content;
+    editor?.commands.setContent(mission.content);
     if (window.innerWidth < 900) document.getElementById('editor-title')?.scrollIntoView({ behavior: 'smooth' });
-  }
-
-  function format(command: string, value?: string) {
-    editor.current?.focus();
-    document.execCommand(command, false, value);
   }
 
   async function uploadImage(file: File | undefined, kind: 'thumbnail' | 'body') {
@@ -107,9 +119,10 @@ export default function MissionManager({ userEmail, role }: MissionManagerProps)
         setThumbnailPath(result.object_path);
         setNotice('썸네일을 올렸습니다. 수정 저장을 눌러 반영해 주세요.');
       } else {
-        format('insertImage', result.url);
-        const image = editor.current?.querySelector<HTMLImageElement>(`img[src="${CSS.escape(result.url)}"]`);
-        if (image) image.alt = file.name.replace(/\.[^.]+$/, '');
+        editor?.chain().focus().setImage({
+          src: result.url,
+          alt: file.name.replace(/\.[^.]+$/, ''),
+        }).run();
         setNotice('본문 이미지를 추가했습니다. 수정 저장을 눌러 반영해 주세요.');
       }
     } catch (error) {
@@ -130,7 +143,7 @@ export default function MissionManager({ userEmail, role }: MissionManagerProps)
           title,
           recommended_age: recommendedAge,
           thumbnail_path: thumbnailPath,
-          content: editor.current?.innerHTML || '',
+          content: editor?.getHTML() || '',
           status: publicationStatus,
         }),
       });
@@ -218,14 +231,17 @@ export default function MissionManager({ userEmail, role }: MissionManagerProps)
             <div className="editor-field">
               <span className="field-label">내용</span>
               <div className="toolbar" role="toolbar" aria-label="내용 서식">
-                <button type="button" onClick={() => format('formatBlock', 'p')}>본문</button>
-                <button type="button" onClick={() => format('formatBlock', 'h2')}>제목</button>
-                <button type="button" onClick={() => format('bold')}><strong>굵게</strong></button>
-                <button type="button" onClick={() => format('insertUnorderedList')}>목록</button>
+                <button type="button" className={editor?.isActive('paragraph') ? 'active' : ''} disabled={!editor} onMouseDown={(event) => event.preventDefault()} onClick={() => editor?.chain().focus().setParagraph().run()}>본문</button>
+                <button type="button" className={editor?.isActive('heading', { level: 2 }) ? 'active' : ''} disabled={!editor} onMouseDown={(event) => event.preventDefault()} onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}>제목</button>
+                <button type="button" className={editor?.isActive('bold') ? 'active' : ''} disabled={!editor} onMouseDown={(event) => event.preventDefault()} onClick={() => editor?.chain().focus().toggleBold().run()}><strong>굵게</strong></button>
+                <button type="button" className={editor?.isActive('bulletList') ? 'active' : ''} disabled={!editor} onMouseDown={(event) => event.preventDefault()} onClick={() => editor?.chain().focus().toggleBulletList().run()}>목록</button>
+                <span className="toolbar-divider" aria-hidden="true" />
+                <button type="button" disabled={!editor?.can().chain().focus().undo().run()} onMouseDown={(event) => event.preventDefault()} onClick={() => editor?.chain().focus().undo().run()} aria-label="실행 취소">↶</button>
+                <button type="button" disabled={!editor?.can().chain().focus().redo().run()} onMouseDown={(event) => event.preventDefault()} onClick={() => editor?.chain().focus().redo().run()} aria-label="다시 실행">↷</button>
                 <button type="button" disabled={!selectedId} onClick={() => bodyImageInput.current?.click()}>이미지</button>
                 <input ref={bodyImageInput} type="file" accept="image/png,image/jpeg,image/gif,image/webp" hidden onChange={(event) => uploadImage(event.target.files?.[0], 'body')} />
               </div>
-              <div ref={editor} className="content-editor" contentEditable suppressContentEditableWarning role="textbox" aria-multiline="true" aria-label="원더미션 내용" data-placeholder="카드뉴스 이미지와 안내 문구를 입력하세요." />
+              <EditorContent editor={editor} className="editor-surface" />
               <p className="help">Supabase private Storage에 PNG·JPEG·GIF·WebP만 저장하며 파일당 최대 5MB입니다.</p>
             </div>
             <div className="form-actions"><span role="status">{notice}</span><button className="primary-button" type="submit" disabled={saving}>{selectedId ? '수정 저장' : '등록하기'}</button></div>

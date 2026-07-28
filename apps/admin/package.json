@@ -10,6 +10,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@tiptap/extension-image": "^3.29.2",
+    "@tiptap/extension-placeholder": "^3.29.2",
+    "@tiptap/pm": "^3.29.2",
+    "@tiptap/react": "^3.29.2",
+    "@tiptap/starter-kit": "^3.29.2",
     "@wonderpin/auth": "*",
     "@wonderpin/database": "*",
     "@wonderpin/ui": "*",
