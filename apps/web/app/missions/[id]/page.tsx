@@ -18,15 +18,28 @@ export default async function MissionDetailPage({ params }: Props) {
   if (!mission) notFound();
   return (
     <article className="mission-detail">
-      <Link className="back-link" href="/" aria-label="원더미션 목록으로 돌아가기">← 목록으로</Link>
-      <header className="detail-heading"><span className="age-chip">{mission.recommended_age}</span><h1>{mission.title}</h1></header>
-      {mission.thumbnail_path && (
-        // Supabase Storage media is streamed through the RLS-protected asset route.
-        // eslint-disable-next-line @next/next/no-img-element
-        <img className="detail-thumbnail" src={missionAssetUrl(mission.thumbnail_path)} alt="" />
-      )}
-      <div className="mission-content" dangerouslySetInnerHTML={{ __html: sanitizeMissionHtml(mission.content) }} />
-      <Link className="back-button" href="/">다른 원더미션 보기</Link>
+      <section className="detail-hero">
+        <Link className="back-link" href="/" aria-label="원더미션 목록으로 돌아가기"><span aria-hidden="true">←</span> 목록으로</Link>
+        <header className="detail-heading">
+          <p className="detail-kicker"><span aria-hidden="true">✦</span> 오늘의 발견</p>
+          <span className="age-chip">{mission.recommended_age}</span>
+          <h1>{mission.title}</h1>
+        </header>
+        <div className="detail-scene" aria-hidden="true">
+          <span className="detail-orbit" />
+          <span className="detail-leaf" />
+          <span className="detail-dot" />
+        </div>
+      </section>
+      <section className="detail-paper" aria-label="원더미션 내용">
+        {mission.thumbnail_path && (
+          // Supabase Storage media is streamed through the RLS-protected asset route.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img className="detail-thumbnail" src={missionAssetUrl(mission.thumbnail_path)} alt="" />
+        )}
+        <div className="mission-content" dangerouslySetInnerHTML={{ __html: sanitizeMissionHtml(mission.content) }} />
+        <Link className="back-button" href="/">다른 원더미션 보기 <span aria-hidden="true">→</span></Link>
+      </section>
     </article>
   );
 }

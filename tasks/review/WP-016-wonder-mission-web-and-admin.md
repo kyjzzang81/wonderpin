@@ -46,6 +46,19 @@
 - 기존 순수 Node `server.mjs`, 정적 HTML·JS·CSS와 그 실행 경로는 제거하고 Next.js workspace 명령만 남겼다.
 - Next.js 개발 서버에서 공개 웹 390px, 관리자 768px 화면을 브라우저로 검수했다. 두 화면 모두 가로 overflow가 없었고, BI·빈 목록·서식 편집기와 기존 프로그램 검수 화면 렌더링을 확인했다.
 
+### 2026-07-28 가족용 웹 시각 리디자인
+
+- WhaleSpace의 다중 radial gradient, 큰 타이포 위계, 넓은 라운드 카드, 반투명 깊이감과 부유 그래픽 원리를 참고하되 자산·레이아웃을 복제하지 않고 Wonder Blue 중심의 자연·발견·탐험 정서로 재해석했다.
+- 홈은 Blue 기반 탐험 히어로, CSS 해·잎·궤도 오브젝트, 반투명 미션 카드와 모바일 1열·태블릿 2열·데스크톱 3열 목록으로 구성했다.
+- 상세는 미션명·권장연령을 먼저 읽는 Blue 히어로와 최대 820px의 흰 콘텐츠 패널로 분리하고, 본문·목록·인용문·이미지 서식을 가독성 중심으로 조정했다.
+- Supabase 목록·상세 조회, Storage asset proxy, HTML 정제와 기존 경로는 변경하지 않았다. 로컬에서 실제 공개 레코드의 목록·상세와 Storage 이미지를 확인했다.
+- `npm run lint --workspace @wonderpin/web`: 통과
+- `npm run typecheck --workspace @wonderpin/web`: 통과
+- `npm test --workspaces --if-present`: `@wonderpin/database` 3/3 통과
+- `npm run build --workspace @wonderpin/web`: Next.js 16.2.11 production build 통과
+- 저장소 통합 `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`: 모두 통과. `@wonderpin/admin`, `@wonderpin/web` production build를 함께 확인했다.
+- 브라우저 검수: 390px 홈·상세 1열, 768px 2열, 1280px 3열을 확인했고 각 너비에서 가로 overflow가 없었다.
+
 ## 남은 위험과 승인 항목
 
 - 공식 원더핀 Instagram URL이 저장소에 없어 추정하지 않았다. `WONDERPIN_INSTAGRAM_URL` 미설정 시 아이콘은 `aria-disabled` 상태다.
@@ -54,4 +67,5 @@
 - 현재 파일 저장 구현은 화면 검증 중 생성된 코드이며 승인된 임시 저장소가 아니다. WP-017에서 제거한다.
 - 현 최소 편집기는 브라우저의 deprecated `execCommand`에 의존한다. 서식 요구가 확대되기 전에 접근성·붙여넣기 정제·브라우저 호환성 기준으로 에디터 교체 여부를 재평가한다.
 - Next.js가 간접 고정한 `postcss@8.4.31`의 moderate advisory는 upstream 업데이트를 추적하고, 호환되는 패치가 제공되면 lockfile을 갱신한다.
+- 리디자인 검수에는 현재 공개된 E2E 레코드 1건을 사용했다. 실제 운영 콘텐츠 공개 전 긴 미션명, 다수 카드, 세로형 카드뉴스 조합을 추가 확인해야 한다.
 - 프로덕션 배포와 운영 DB 변경은 하지 않았다.
