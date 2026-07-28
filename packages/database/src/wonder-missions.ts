@@ -88,6 +88,13 @@ export function sanitizeMissionHtml(input: unknown) {
       if (!safeHref) return '';
       attributes.push(`href="${escapeAttribute(safeHref)}"`, 'target="_blank"', 'rel="noreferrer noopener"');
     }
+    if (['p', 'h2', 'h3'].includes(name)) {
+      const style = rawAttributes.match(/\bstyle\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i);
+      const alignment = String(style?.[1] ?? style?.[2] ?? style?.[3] ?? '')
+        .match(/\btext-align\s*:\s*(left|center|right)\b/i)?.[1]
+        ?.toLowerCase();
+      if (alignment) attributes.push(`style="text-align: ${alignment}"`);
+    }
     return `<${name}${attributes.length ? ` ${attributes.join(' ')}` : ''}>`;
   }).trim();
 }

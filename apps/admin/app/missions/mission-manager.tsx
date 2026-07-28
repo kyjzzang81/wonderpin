@@ -9,6 +9,7 @@ import {
 } from '@wonderpin/database/wonder-missions';
 import Image from '@tiptap/extension-image';
 import Placeholder from '@tiptap/extension-placeholder';
+import TextAlign from '@tiptap/extension-text-align';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { FormEvent, useEffect, useRef, useState } from 'react';
@@ -55,6 +56,7 @@ export default function MissionManager({ userEmail, role }: MissionManagerProps)
       StarterKit.configure({ heading: { levels: [2, 3] } }),
       Image.configure({ allowBase64: false, inline: false }),
       Placeholder.configure({ placeholder: '카드뉴스 이미지와 안내 문구를 입력하세요.' }),
+      TextAlign.configure({ types: ['heading', 'paragraph'], alignments: ['left', 'center', 'right'] }),
     ],
     editorProps: {
       attributes: {
@@ -97,19 +99,42 @@ export default function MissionManager({ userEmail, role }: MissionManagerProps)
     if (window.innerWidth < 900) document.getElementById('editor-title')?.scrollIntoView({ behavior: 'smooth' });
   }
 
+  function chooseImage(kind: 'thumbnail' | 'body') {
+    if (!selectedId && (!title.trim() || !recommendedAge.trim())) {
+      setNotice('이미지를 추가하려면 원더미션명과 권장연령을 먼저 입력해 주세요.');
+      return;
+    }
+    (kind === 'thumbnail' ? thumbnailInput : bodyImageInput).current?.click();
+  }
+
+  async function ensureDraftForUpload() {
+    if (selectedId) return selectedId;
+    const saved = await api<WonderMission>('/api/missions', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        recommended_age: recommendedAge,
+        thumbnail_path: null,
+        content: editor?.getHTML() || '',
+        status: 'draft',
+      }),
+    });
+    setSelectedId(saved.id);
+    setPublicationStatus('draft');
+    await loadMissions();
+    return saved.id;
+  }
+
   async function uploadImage(file: File | undefined, kind: 'thumbnail' | 'body') {
     const input = kind === 'thumbnail' ? thumbnailInput : bodyImageInput;
     if (!file) return;
-    if (!selectedId) {
-      setNotice('이미지를 올리기 전에 텍스트 내용을 먼저 저장해 주세요.');
-      if (input.current) input.current.value = '';
-      return;
-    }
     setNotice('이미지 업로드 중…');
     try {
+      const missionId = await ensureDraftForUpload();
       const form = new FormData();
       form.append('file', file);
-      form.append('mission_id', selectedId);
+      form.append('mission_id', missionId);
       form.append('kind', kind);
       const result = await api<{ object_path: string; url: string }>('/api/mission-images', {
         method: 'POST',
@@ -222,11 +247,11 @@ export default function MissionManager({ userEmail, role }: MissionManagerProps)
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={missionAssetUrl(thumbnailPath)} alt="현재 원더미션 썸네일" />
               )}
-              <button type="button" disabled={!selectedId} onClick={() => thumbnailInput.current?.click()}>
+              <button type="button" onClick={() => chooseImage('thumbnail')}>
                 {thumbnailPath ? '썸네일 교체' : '썸네일 업로드'}
               </button>
               <input ref={thumbnailInput} type="file" accept="image/png,image/jpeg,image/gif,image/webp" hidden onChange={(event) => uploadImage(event.target.files?.[0], 'thumbnail')} />
-              {!selectedId && <small>텍스트 내용을 먼저 저장하면 이미지를 올릴 수 있습니다.</small>}
+              {!selectedId && <small>이미지를 선택하면 비공개 초안이 자동 저장됩니다.</small>}
             </div>
             <div className="editor-field">
               <span className="field-label">내용</span>
@@ -236,9 +261,13 @@ export default function MissionManager({ userEmail, role }: MissionManagerProps)
                 <button type="button" className={editor?.isActive('bold') ? 'active' : ''} disabled={!editor} onMouseDown={(event) => event.preventDefault()} onClick={() => editor?.chain().focus().toggleBold().run()}><strong>굵게</strong></button>
                 <button type="button" className={editor?.isActive('bulletList') ? 'active' : ''} disabled={!editor} onMouseDown={(event) => event.preventDefault()} onClick={() => editor?.chain().focus().toggleBulletList().run()}>목록</button>
                 <span className="toolbar-divider" aria-hidden="true" />
+                <button type="button" className={editor?.isActive({ textAlign: 'left' }) ? 'active' : ''} disabled={!editor} onMouseDown={(event) => event.preventDefault()} onClick={() => editor?.chain().focus().setTextAlign('left').run()} aria-label="왼쪽 정렬">좌</button>
+                <button type="button" className={editor?.isActive({ textAlign: 'center' }) ? 'active' : ''} disabled={!editor} onMouseDown={(event) => event.preventDefault()} onClick={() => editor?.chain().focus().setTextAlign('center').run()} aria-label="가운데 정렬">중</button>
+                <button type="button" className={editor?.isActive({ textAlign: 'right' }) ? 'active' : ''} disabled={!editor} onMouseDown={(event) => event.preventDefault()} onClick={() => editor?.chain().focus().setTextAlign('right').run()} aria-label="오른쪽 정렬">우</button>
+                <span className="toolbar-divider" aria-hidden="true" />
                 <button type="button" disabled={!editor?.can().chain().focus().undo().run()} onMouseDown={(event) => event.preventDefault()} onClick={() => editor?.chain().focus().undo().run()} aria-label="실행 취소">↶</button>
                 <button type="button" disabled={!editor?.can().chain().focus().redo().run()} onMouseDown={(event) => event.preventDefault()} onClick={() => editor?.chain().focus().redo().run()} aria-label="다시 실행">↷</button>
-                <button type="button" disabled={!selectedId} onClick={() => bodyImageInput.current?.click()}>이미지</button>
+                <button type="button" onClick={() => chooseImage('body')}>이미지</button>
                 <input ref={bodyImageInput} type="file" accept="image/png,image/jpeg,image/gif,image/webp" hidden onChange={(event) => uploadImage(event.target.files?.[0], 'body')} />
               </div>
               <EditorContent editor={editor} className="editor-surface" />

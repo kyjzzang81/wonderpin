@@ -34,7 +34,7 @@
 
 - 공개 콘텐츠의 서버 렌더링, 관리자 Route Handler, React·TypeScript 공유와 향후 Supabase 인증·스토리지 확장을 한 체계에서 제공하기 위해 Next.js App Router를 선택했다.
 - 공개 웹과 관리자는 배포·권한 경계가 달라 별도 workspace 앱으로 유지하고, DB 계약·UI·설정만 `packages/`에서 공유한다.
-- 관리자 내용 편집기는 Tiptap 기반 WYSIWYG를 사용한다. 제목·본문·굵게·목록·실행 취소·다시 실행과 Supabase Storage 이미지 삽입을 제공하며 저장 시 서버 허용 목록으로 HTML을 정제한다.
+- 관리자 내용 편집기는 Tiptap 기반 WYSIWYG를 사용한다. 제목·본문·굵게·목록·문단 정렬·실행 취소·다시 실행과 Supabase Storage 이미지 삽입을 제공하며 저장 시 서버 허용 목록으로 HTML을 정제한다. 신규 미션의 이미지 선택 시 비공개 초안을 자동 생성한다.
 
 ## 검증 결과
 

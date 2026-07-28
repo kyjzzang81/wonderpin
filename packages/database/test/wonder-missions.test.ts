@@ -33,6 +33,15 @@ test('sanitizer only keeps safe links and Supabase mission asset proxy sources',
   assert.match(value, /api\/mission-assets/);
 });
 
+test('sanitizer preserves only supported paragraph alignment', () => {
+  const value = sanitizeMissionHtml(
+    '<p style="color:red; text-align: center" onclick="bad()">가운데</p><h2 style="text-align:right">오른쪽</h2><p style="text-align: justify">제거</p>',
+  );
+  assert.match(value, /<p style="text-align: center">/);
+  assert.match(value, /<h2 style="text-align: right">/);
+  assert.doesNotMatch(value, /color|onclick|justify/);
+});
+
 test('image validation checks declared type, signature and limit', () => {
   const png = Uint8Array.from([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 0]);
   assert.deepEqual(validateMissionImage('image/png', png), { mimeType: 'image/png', extension: 'png' });
