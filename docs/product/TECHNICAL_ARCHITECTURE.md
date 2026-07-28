@@ -1,6 +1,6 @@
 # 원더핀 기술 구조
 
-> **현재 상태(2026-07-27): 원더미션 Supabase 연동 코드·migration 검토 단계.** `apps/web`과 `apps/admin`은 Supabase Database·Storage·Auth·RLS를 사용하도록 전환했고 JSON·로컬 업로드 실행 경로는 제거했다. Local DB reset과 RLS test 8건은 통과했지만 승인된 원격 migration·계정 E2E는 아직 완료되지 않았으므로 운영 CRUD로 간주하거나 배포하지 않는다.
+> **현재 상태(2026-07-28): 원더미션 Supabase 연동 코드·migration 검토 단계.** `apps/web`과 `apps/admin`은 Supabase Database·Storage·Auth·RLS를 사용하도록 전환했고 JSON·로컬 업로드 실행 경로는 제거했다. Local DB reset과 RLS test 8건을 통과했고 승인된 원격 migration도 적용했다. 첫 관리자 역할 등록과 계정 E2E는 아직 완료되지 않았으므로 운영 CRUD로 간주하거나 배포하지 않는다.
 
 ## 1. 제품 구성
 
@@ -23,7 +23,7 @@
 - 결제: 국내 결제 제공자 검토 후 결정
 - 이메일·문자·알림: MVP 운영 정책과 개인정보 검토 후 결정
 
-현재 패키지 관리자는 npm workspaces, 프론트엔드·서버는 Next.js App Router와 TypeScript로 확정했다. Supabase schema, private Storage bucket, Auth와 RLS 정책의 local migration은 `WP-017`에 구현되어 있다. 승인된 원격 적용과 권한별 E2E 전 관리자 CRUD는 운영 가능 상태로 간주하지 않는다.
+현재 패키지 관리자는 npm workspaces, 프론트엔드·서버는 Next.js App Router와 TypeScript로 확정했다. Supabase schema, private Storage bucket, Auth와 RLS 정책은 `WP-017`에 구현되어 원격 프로젝트에 적용됐다. 첫 관리자 역할 등록과 권한별 E2E 전 관리자 CRUD는 운영 가능 상태로 간주하지 않는다.
 
 ### 원더미션 저장 원칙
 
@@ -62,7 +62,7 @@ on conflict (user_id) do update
 set role = excluded.role;
 ```
 
-이 SQL과 `supabase db push`는 운영 데이터베이스 변경이므로 사용자 승인 전 실행하지 않는다.
+이 bootstrap SQL은 운영 데이터베이스 변경이므로 사용자 승인 전 실행하지 않는다. `supabase db push`는 2026-07-28 사용자 승인 후 migration `20260727131140`에 대해 실행했다.
 
 ## 3. 공유 패키지
 

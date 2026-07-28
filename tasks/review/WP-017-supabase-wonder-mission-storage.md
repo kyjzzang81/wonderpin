@@ -40,7 +40,7 @@
 
 ## 현재 상태
 
-2026-07-27 기준 로컬 구현과 정적 검증을 완료했다.
+2026-07-28 기준 로컬 구현·검증과 승인된 원격 migration 적용을 완료했다.
 
 - `supabase/migrations/20260727131140_create_wonder_missions.sql`에 원더미션, 관리자 역할, 이미지 자산, private Storage bucket과 RLS를 정의했다.
 - `packages/database`를 Supabase 타입·쿼리·검증 계층으로 전환하고 JSON·로컬 파일 저장 코드를 제거했다.
@@ -60,11 +60,11 @@
 - `npm audit`: high 8건, critical 0건. 프로덕션 그래프에는 Next.js가 고정한 `postcss@8.4.31`, optional `sharp@0.34.5` 관련 high 3건이 남고 나머지는 lint 개발 도구 그래프다.
 - `supabase db reset`: 통과. 빈 로컬 DB에 migration과 seed가 재현 가능하게 적용됐다.
 - `supabase test db`: 역할별 RLS 테스트 8/8 통과
-- 원격 migration과 Storage/RLS 적용: 사용자 승인 전 실행하지 않음
+- 원격 migration과 Storage/RLS 적용: `20260727131140` 적용 완료, local/remote 버전 일치 및 원격 schema lint 통과
 
 ## 남은 완료 조건과 위험
 
-- 승인된 원격 프로젝트에 migration을 적용하고 첫 `super_admin` 역할을 bootstrap해야 한다.
+- 첫 `super_admin` 역할을 bootstrap해야 한다.
 - 실제 관리자 계정으로 초안 작성 → 이미지 업로드 → 공개 → 가족용 목록·상세 조회 → 삭제 흐름을 검증해야 한다.
 - 첫 관리자 역할은 기존 super admin이 없으므로 Dashboard SQL Editor 또는 별도 승인된 관리 경로에서 한 번 bootstrap해야 한다.
 - Next.js 호환 범위에서 postcss·sharp 보안 패치가 포함된 릴리스를 추적해야 한다.
