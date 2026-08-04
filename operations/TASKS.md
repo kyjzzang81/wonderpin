@@ -1,6 +1,6 @@
 # 원더핀 업무 보드
 
-최종 갱신: 2026-07-27
+최종 갱신: 2026-08-05
 
 ## 실행 순서
 
@@ -21,13 +21,13 @@
 | ID | 업무 | 담당 | 우선순위 | 목표일 | 상세 |
 | --- | --- | --- | --- | --- | --- |
 | WP-013 | 아동 발달 기반 원더미션 설계 연구 | wonderpack-developer | P0 | 2026-07-24 | `tasks/active/WP-013-child-development-mission-design-study.md` |
+| WP-011 | 휴대형 야외 탐험 카드 시제품과 사용성 검증 | wonderpack-developer | P0 | 2026-08-14 | `tasks/active/WP-011-portable-outdoor-card-prototype.md` |
 | WP-007 | 이주의 원더핀 공개 프로그램 후보 조사와 주간 검수 체계 | data-researcher | P1 | 2026-07-17 | `tasks/active/WP-007-weekly-wonderpin-program-research.md` |
 
 ## Backlog
 
 | ID | 업무 | 담당 | 우선순위 | 목표일 | 상세 |
 | --- | --- | --- | --- | --- | --- |
-| WP-011 | 휴대형 야외 탐험 카드 시제품과 사용성 검증 | wonderpack-developer | P0 | 2026-08-14 | `tasks/backlog/WP-011-portable-outdoor-card-prototype.md` |
 | WP-012 | 휴대형 야외 탐험 카드 유료 파일럿과 단위경제성 | business-strategist | P0 | 2026-09-28 | `tasks/backlog/WP-012-paid-card-pilot-and-unit-economics.md` |
 | WP-003 | 웹앱 모노레포 초기화와 3개 앱 셸 구현 | app-developer | P2 | 미정 | `tasks/backlog/WP-003-monorepo-app-shells.md` |
 | WP-005 | 인스타그램 두 정기 시리즈 4주 실행안 | social-content | P1 | 미정 | `tasks/backlog/WP-005-instagram-four-week-operation.md` |
